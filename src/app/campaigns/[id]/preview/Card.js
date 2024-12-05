@@ -10,12 +10,16 @@ const Card = ({ recipient, setSelectedRecipient, selected }) => {
         selected ? "bg-gray-100" : ""
       )}
     >
-      {recipient.name}
+      <div className="font-semibold">{recipient && recipient.name}</div>
       <div className="flex gap-1">
-        <Badge>{recipient.generation}</Badge>
-        <Badge>{recipient.status}</Badge>
+        <Badge variant="secondary" className="bg-orange-100">
+          {recipient && recipient.generation}
+        </Badge>
+        <Badge variant="secondary" className="bg-purple-100">
+          {recipient && recipient.status}
+        </Badge>
       </div>
-      <div className="w-full">{recipient.info}</div>
+      <div className="w-full">{recipient && recipient.info}</div>
     </div>
   );
 };

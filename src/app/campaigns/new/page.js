@@ -10,11 +10,13 @@ import {
   FormMessage,
   Form,
   FormField,
+  FormDescription,
 } from "../../../components/ui/form";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Input } from "../../../components/ui/input";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -24,6 +26,9 @@ const formSchema = z.object({
 
 export default function CampaignForm() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,6 +41,7 @@ export default function CampaignForm() {
   const onSubmit = (data) => {
     const createCampaign = async (formData) => {
       try {
+        setLoading(true);
         const response = await fetch("http://localhost:3000/api/campaigns", {
           method: "POST",
           headers: {
@@ -46,13 +52,13 @@ export default function CampaignForm() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const responseData = await response.json();
-        console.log(responseData, "DATA RECIEVED");
-
         router.push(`/campaigns/${responseData.campaign_id}/preview`);
       } catch (err) {
         console.log(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -61,7 +67,8 @@ export default function CampaignForm() {
 
   return (
     <div className="grid grid-cols-1 gap-3 p-6 w-full">
-      <h1 className="text-2xl my-6">New Campaign</h1>
+      <h1 className="text-2xl mt-4">New Campaign</h1>
+      <div className="text-l mb-6">54 Recipients Selected</div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -69,9 +76,9 @@ export default function CampaignForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Campaign Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your name" {...field} />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,7 +91,7 @@ export default function CampaignForm() {
               <FormItem>
                 <FormLabel>Description (optional)</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Add a description" {...field} />
+                  <Textarea placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,9 +104,16 @@ export default function CampaignForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email Template</FormLabel>
+                <FormDescription>
+                  {`Use double carrots << >> for text that you'd like AI to personalize.`}
+                  <br />
+                  {`Use double curly braces {{ }} for values that should be replaced
+                  with specific data.`}
+                </FormDescription>
                 <FormControl>
                   <Textarea
-                    placeholder="Enter your email template"
+                    className="h-32"
+                    placeholder={`Hello {{first_name}}, \n\n <<Connect with friends who are interested in crafts today>> \n\n Your Friends and Just Friends`}
                     {...field}
                   />
                 </FormControl>
@@ -108,7 +122,12 @@ export default function CampaignForm() {
             )}
           />
 
-          <Button type="submit">Generate Emails</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Loading..." : "Generate Emails"}
+          </Button>
+          <div className="text-red-600">
+            {error && `Error. Try again later ` + error}
+          </div>
         </form>
       </Form>
     </div>

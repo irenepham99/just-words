@@ -1,14 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import React from "react";
-import { ScrollArea } from "../../../../components/ui/scroll-area";
 import { Button } from "../../../../components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import Card from "./Card";
 import GeneratedText from "./GeneratedText";
 import AiPrompt from "./AiPrompt";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Spinner } from "../../../../components/ui/spinner";
 
 export default function CampaignPreview({ params }) {
   const { id } = React.use(params);
@@ -16,23 +15,31 @@ export default function CampaignPreview({ params }) {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [selectedGender, setSelectedGender] = useState("female");
   const router = useRouter();
-
-  const fetchCampaignResults = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/campaigns/${id}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const responseData = await response.json();
-      setCampaign(responseData);
-      setSelectedRecipient(responseData.emails[0]);
-      console.log(responseData, "CAMPAIGN FETCHED");
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const [loadingCampaign, setLoadingCampaign] = useState(false);
+  const [loadingRegenerate, setLoadingRegenerate] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchCampaignResults = async () => {
+      try {
+        setLoadingCampaign(true);
+        const response = await fetch(
+          `http://localhost:3000/api/campaigns/${id}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
+        setCampaign(responseData);
+        setSelectedRecipient(responseData.emails[0]);
+      } catch (err) {
+        console.log(err);
+        setError(err.message);
+      } finally {
+        setLoadingCampaign(false);
+      }
+    };
+
     fetchCampaignResults();
   }, []);
 
@@ -47,6 +54,7 @@ export default function CampaignPreview({ params }) {
   const regenerateSection = (section_ids) => {
     const callRegenerate = async () => {
       try {
+        setLoadingRegenerate(true);
         const payload = {
           section_ids: section_ids,
           recipient_id: selectedRecipient.id,
@@ -64,21 +72,43 @@ export default function CampaignPreview({ params }) {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const responseData = await response.json();
-        console.log(responseData, "REGENERATED");
-        fetchCampaignResults();
+        const data = await response.json();
+        setCampaign(data);
+        setSelectedRecipient(
+          data.emails.find((recipient) => recipient.id == selectedRecipient.id)
+        );
       } catch (err) {
         console.log(err);
+        setError(err.message);
+      } finally {
+        setLoadingRegenerate(false);
       }
     };
 
     callRegenerate();
   };
 
+  if (error) {
+    return (
+      <div className="text-xl text-red-500 w-full h-full flex items-center justify-center">
+        Error. Try again later. {error}
+      </div>
+    );
+  }
+
+  if (loadingCampaign) {
+    return (
+      <div className="text-3xl w-full h-full flex items-center justify-center">
+        <Spinner size="lg" className="bg-black dark:bg-white" />
+        <div className="px-4">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 ">
-      <div className="flex items-center justify-between px-4 mt-10 mb-4">
-        <div className="text-2xl">Campaign Name</div>
+    <div className="grid grid-cols-1 gap-1">
+      <div className="flex items-center h-fit justify-between px-4 mt-10 mb-4">
+        <div className="text-2xl">{campaign ? campaign.name : ""}</div>
         <Button
           onClick={() => router.push(`/campaigns/${id}/success`)}
           className="w-fit"
@@ -86,6 +116,7 @@ export default function CampaignPreview({ params }) {
           Send Emails
         </Button>
       </div>
+
       <div className="flex">
         <div className="h-screen w-1/3 overflow-y-auto border p-2">
           <Tabs defaultValue="female" className="w-full m-2">
@@ -117,7 +148,7 @@ export default function CampaignPreview({ params }) {
               ))}
         </div>
 
-        <div className="w-full grid grid-cols-1 gap-2 w-2/3">
+        <div className="w-full grid grid-cols-1 w-2/3">
           <div className="border p-4">
             {selectedRecipient &&
               selectedRecipient.email.map((section, index) => {
@@ -126,6 +157,7 @@ export default function CampaignPreview({ params }) {
                     regenerateSection={regenerateSection}
                     key={index}
                     section={section}
+                    loading={loadingRegenerate}
                   />
                 ) : (
                   <div key={index} className="p-2 m-2">
@@ -135,7 +167,7 @@ export default function CampaignPreview({ params }) {
               })}
           </div>
           <div className="w-full p-2 place-items-center">
-            <AiPrompt regenerate={regenerateAll} />
+            <AiPrompt loading={loadingRegenerate} regenerate={regenerateAll} />
           </div>
         </div>
       </div>

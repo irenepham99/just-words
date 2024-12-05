@@ -12,6 +12,7 @@ import {
 } from "../../../../components/ui/form";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
+import { Spinner } from "../../../../components/ui/spinner";
 
 const formSchema = z.object({
   prompt: z
@@ -19,7 +20,7 @@ const formSchema = z.object({
     .min(1, "Please enter instructions for AI to fix the email"),
 });
 
-export default function AiPrompt({ regenerate }) {
+export default function AiPrompt({ regenerate, loading }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,7 +32,7 @@ export default function AiPrompt({ regenerate }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(regenerate)}
-        className="flex items-center space-x-2"
+        className="flex items-center space-x-2 "
       >
         <FormField
           className="align-self-center"
@@ -42,7 +43,7 @@ export default function AiPrompt({ regenerate }) {
               <FormControl>
                 <Input
                   placeholder="Fix with AI"
-                  className="border-2 border-blue-300"
+                  className="border-2 border-emerald-500 bg-white h-12 w-full"
                   {...field}
                 />
               </FormControl>
@@ -52,10 +53,14 @@ export default function AiPrompt({ regenerate }) {
         />
         <Button
           type="submit"
-          className="bg-blue-400"
-          disabled={!form.formState.isValid}
+          className="bg-emerald-500 h-12"
+          disabled={!form.formState.isValid || loading}
         >
-          Submit
+          {loading ? (
+            <Spinner size="sm" className="bg-black dark:bg-white" />
+          ) : (
+            "Submit"
+          )}
         </Button>
       </form>
     </Form>
