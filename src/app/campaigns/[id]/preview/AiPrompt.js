@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Send } from "lucide-react";
 import {
   FormItem,
   FormControl,
@@ -59,7 +60,7 @@ export default function AiPrompt({ regenerate, loading }) {
           {loading ? (
             <Spinner size="sm" className="bg-black dark:bg-white" />
           ) : (
-            "Submit"
+            <Send />
           )}
         </Button>
       </form>

@@ -71,58 +71,60 @@ export default function CampaignForm() {
       <div className="text-l mb-6">54 Recipients Selected</div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Campaign Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description (optional)</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="bg-white p-6 border border-color-gray-100 rounded space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Campaign Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="emailTemplate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email Template</FormLabel>
-                <FormDescription>
-                  {`Use double carrots << >> for text that you'd like AI to personalize.`}
-                  <br />
-                  {`Use double curly braces {{ }} for values that should be replaced
+            <FormField
+              control={form.control}
+              name="emailTemplate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Template</FormLabel>
+                  <FormDescription>
+                    {`Use double carrots << >> for text that you'd like AI to personalize.`}
+                    <br />
+                    {`Use double curly braces {{ }} for values that should be replaced
                   with specific data.`}
-                </FormDescription>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    placeholder={`Hello {{first_name}}, \n\n <<Connect with friends who are interested in crafts today>> \n\n Your Friends and Just Friends`}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  </FormDescription>
+                  <FormControl>
+                    <Textarea
+                      className="h-32"
+                      placeholder={`Hello {{first_name}}, \n\n <<Connect with friends who are interested in crafts today>> \n\n Your Friends and Just Friends`}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" className="bg-brandBlue" disabled={loading}>
             {loading ? "Loading..." : "Generate Emails"}
           </Button>
           <div className="text-red-600">

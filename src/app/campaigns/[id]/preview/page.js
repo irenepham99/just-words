@@ -107,34 +107,33 @@ export default function CampaignPreview({ params }) {
 
   return (
     <div className="grid grid-cols-1 gap-1">
-      <div className="flex items-center h-fit justify-between px-4 mt-10 mb-4">
-        <div className="text-2xl">{campaign ? campaign.name : ""}</div>
+      <div className="text-2xl mt-10 ml-8 mb-2">
+        Preview and Edit {campaign ? campaign.name : ""}
+      </div>
+      <div className="flex items-center h-fit justify-between px-4">
+        <Tabs defaultValue="female" className="w-full mx-2">
+          <TabsList>
+            <TabsTrigger
+              onClick={() => setSelectedGender("female")}
+              value="female"
+            >
+              Female
+            </TabsTrigger>
+            <TabsTrigger onClick={() => setSelectedGender("male")} value="male">
+              Male
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
         <Button
           onClick={() => router.push(`/campaigns/${id}/success`)}
-          className="w-fit"
+          className="w-fit bg-brandBlue"
         >
           Send Emails
         </Button>
       </div>
 
       <div className="flex">
-        <div className="h-screen w-1/3 overflow-y-auto border p-2">
-          <Tabs defaultValue="female" className="w-full m-2">
-            <TabsList>
-              <TabsTrigger
-                onClick={() => setSelectedGender("female")}
-                value="female"
-              >
-                Female
-              </TabsTrigger>
-              <TabsTrigger
-                onClick={() => setSelectedGender("male")}
-                value="male"
-              >
-                Male
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+        <div className="h-screen w-1/3 overflow-y-auto m-2">
           {campaign &&
             campaign.emails
               .filter((recipient) => recipient.gender == selectedGender)
@@ -149,7 +148,7 @@ export default function CampaignPreview({ params }) {
         </div>
 
         <div className="w-full grid grid-cols-1 w-2/3">
-          <div className="border p-4">
+          <div className="bg-white rounded p-4 m-4 border border-color-gray-100">
             {selectedRecipient &&
               selectedRecipient.email.map((section, index) => {
                 return section.generated ? (

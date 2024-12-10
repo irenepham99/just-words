@@ -6,8 +6,8 @@ const Card = ({ recipient, setSelectedRecipient, selected }) => {
     <div
       onClick={() => setSelectedRecipient(recipient)}
       className={cn(
-        "w-full grid grid-cols-1 gap-2 p-6 hover:bg-gray-100",
-        selected ? "bg-gray-100" : ""
+        " rounded border bg-white w-full grid grid-cols-1 gap-2 my-2 p-6 hover:border-brandBlue hover:border-opacity-50 hover:border-2",
+        selected ? "border-2 border-brandBlue border-opacity-50" : ""
       )}
     >
       <div className="font-semibold">{recipient && recipient.name}</div>
